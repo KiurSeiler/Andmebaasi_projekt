@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Component Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .component, .details, .popup {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 90%;
+            max-width: 800px;
+        }
+        .component h3 { margin: 0; cursor: pointer; }
+        .details { display: none; background-color: #f9f9f9; }
+        .show { display: block; }
+        .popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; background-color: white; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); }
+        .popup.active { display: block; }
+        .popup-header { display: flex; justify-content: space-between; align-items: center; }
+        .popup-header h3 { margin: 0; }
+        .close-btn { cursor: pointer; }
+        .form-group { margin-bottom: 10px; }
+    </style>
+    <script>
+        function toggleDetails(componentId) {
+            var details = document.getElementById("details-" + componentId);
+            details.classList.toggle("show");
+        }
+
+        function openPopup() {
+            document.getElementById("addComponentPopup").classList.add("active");
+        }
+
+        function closePopup() {
+            document.getElementById("addComponentPopup").classList.remove("active");
+        }
+
+        function showFields() {
+    var type = document.getElementById("componentType").value;
+    document.querySelectorAll(".form-fields").forEach(field => field.style.display = "none");
+    
+    var fieldIdMap = {
+        "SBC": "SBCFields",
+        "Microcontroller": "MicrocontrollerFields",
+        "Motor Controller": "MotorControllerFields",
+        "Motor": "MotorFields",
+        "Sensor": "SensorFields",
+        "Module": "ModuleFields"
+    };
+    
+    if (fieldIdMap[type]) {
+        document.getElementById(fieldIdMap[type]).style.display = "block";
+    }
+}
+
+    </script>
+</head>
+<body>
+    <h1>Component List</h1>
+
+    <form action="/" method="get" class="search-bar">
+        <input type="text" name="search" placeholder="Search by name or type" value="{{ query }}">
+        <button type="submit">Search</button>
+    </form>
+
+    <button onclick="openPopup()">Add New Component</button>
+
+    <div class="popup" id="addComponentPopup">
+        <div class="popup-header">
+            <h3>Add New Component</h3>
+            <span class="close-btn" onclick="closePopup()">✖</span>
+        </div>
+        <form action="/add_component" method="post">
+            <div class="form-group">
+                <label for="componentType">Component Type</label>
+                <select id="componentType" name="type" onchange="showFields()">
+                    <option value="">Select Type</option>
+                    <option value="SBC">SBC</option>
+                    <option value="Microcontroller">Microcontroller</option>
+                    <option value="Motor Controller">Motor Controller</option>
+                    <option value="Motor">Motor</option>
+                    <option value="Sensor">Sensor</option>
+                    <option value="Module">Module</option>
+                </select>
+            </div>
+
+            <div id="SBCFields" class="form-fields" style="display: none;">
+                <div class="form-group"><label>Name</label><input type="text" name="name"></div>
+                <div class="form-group"><label>CPU Architecture</label><input type="text" name="cpu_architecture"></div>
+                <div class="form-group"><label>Clock Speed (GHz)</label><input type="number" step="0.1" name="clock_speed"></div>
+                <div class="form-group"><label>Cores</label><input type="number" name="cores"></div>
+                <div class="form-group"><label>RAM Size (MB)</label><input type="number" name="ram_size"></div>
+                <div class="form-group"><label>Storage Options</label><input type="text" name="storage_options"></div>
+                <div class="form-group"><label>GPIO Pins</label><input type="number" name="gpio_pins"></div>
+                <div class="form-group"><label>USB Ports</label><input type="text" name="usb_ports"></div>
+                <div class="form-group"><label>Power Consumption</label><input type="text" name="power_consumption"></div>
+                <div class="form-group"><label>Description</label><textarea name="description"></textarea></div>
+            </div>
+            <div id="MicrocontrollerFields" class="form-fields" style="display: none;">
+                <div class="form-group"><label>Name</label><input type="text" name="name"></div>
+                <div class="form-group"><label>Family</label><input type="text" name="family"></div>
+                <div class="form-group"><label>Clock Speed (MHz)</label><input type="number" step="0.1" name="clock_speed"></div>
+                <div class="form-group"><label>Flash Memory (KB)</label><input type="number" name="flash_memory"></div>
+                <div class="form-group"><label>GPIO Pins</label><input type="number" name="gpio_pins"></div>
+                <div class="form-group"><label>PWM Channels</label><input type="number" name="pwm_channels"></div>
+                <div class="form-group"><label>Communication Interfaces</label><input type="text" name="comms_interfaces"></div>
+                <div class="form-group"><label>Power Supply Requirements</label><input type="text" name="power_supply"></div>
+            </div>
+            <div id="MotorControllerFields" class="form-fields" style="display: none;">
+                <div class="form-group"><label>Name</label><input type="text" name="name"></div>
+                <div class="form-group"><label>Type</label><input type="text" name="type"></div>
+                <div class="form-group"><label>Input Voltage Range</label><input type="text" name="input_voltage_range"></div>
+                <div class="form-group"><label>Current Rating</label><input type="text" name="current_rating"></div>
+                <div class="form-group"><label>Number of Channels</label><input type="number" name="number_of_channels"></div>
+                <div class="form-group"><label>Control Method</label><input type="text" name="control_method"></div>
+                <div class="form-group"><label>Supported Motor Types</label><input type="text" name="supported_motor_types"></div>
+            </div>
+            <div id="MotorFields" class="form-fields" style="display: none;">
+                <div class="form-group"><label>Name</label><input type="text" name="name"></div>
+                <div class="form-group"><label>Motor Type</label><input type="text" name="motor_type"></div>
+                <div class="form-group"><label>Rated Voltage (V)</label><input type="number" step="0.1" name="rated_voltage"></div>
+                <div class="form-group"><label>Current Draw (A)</label><input type="number" step="0.1" name="current_draw"></div>
+                <div class="form-group"><label>Torque</label><input type="text" name="torque"></div>
+                <div class="form-group"><label>RPM</label><input type="number" name="rpm"></div>
+                <div class="form-group"><label>Gear Ratio</label><input type="text" name="gear_ratio"></div>
+                <div class="form-group"><label>Additional Information</label><textarea name="additional_info"></textarea></div>
+            </div>
+            <div id="SensorFields" class="form-fields" style="display: none;">
+                <div class="form-group"><label>Name</label><input type="text" name="name"></div>
+                <div class="form-group"><label>Sensor Type</label><input type="text" name="sensor_type"></div>
+                <div class="form-group"><label>Measurement Range</label><input type="text" name="measurement_range"></div>
+                <div class="form-group"><label>Accuracy</label><input type="text" name="accuracy"></div>
+                <div class="form-group"><label>Response Time</label><input type="text" name="response_time"></div>
+                <div class="form-group"><label>Operating Voltage</label><input type="text" name="operating_voltage"></div>
+                <div class="form-group"><label>Communication Protocol</label><input type="text" name="comms_protocol"></div>
+                <div class="form-group"><label>Output Type</label><input type="text" name="output_type"></div>
+            </div>
+            <div id="ModuleFields" class="form-fields" style="display: none;">
+                <div class="form-group"><label>Name</label><input type="text" name="name"></div>
+                <div class="form-group"><label>Type</label><input type="text" name="module_type"></div>
+                <div class="form-group"><label>Protocol</label><input type="text" name="protocol"></div>
+                <div class="form-group"><label>Data Rate</label><input type="text" name="data_rate"></div>
+                <div class="form-group"><label>Communication Range</label><input type="text" name="communication_range"></div>
+                <div class="form-group"><label>Supported Voltage</label><input type="text" name="supported_voltage"></div>
+                <div class="form-group"><label>Power Consumption</label><input type="text" name="power_consumption"></div>
+                <div class="form-group"><label>Additional Info</label><textarea name="additional_info"></textarea></div>
+            </div>
+            <button type="submit">Add Component</button>
+
+
+        </form>
+    </div>
+
+    <div>
+        {% if components %}
+            {% for component in components %}
+                <div class="component" onclick="toggleDetails('{{ component[0] }}')">
+                    <h3>{{ component[1] }} ({{ component[2] }})</h3>
+                    <p><strong>Quantity:</strong> {{ component[3] }}</p>
+                    
+                    <!-- <p><strong>Status:</strong> {{ "In Use" if component[4] else "Available" }}</p> -->
+                </div>
+                
+                <div class="details" id="details-{{ component[0] }}">
+                    <h4>Details:</h4>
+                    {% if details[component[0]] %}
+                        <ul>
+                            {% for label, value in details[component[0]].items() %}
+                                <li><strong>{{ label }}:</strong> {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No additional details available for this component.</p>
+                    {% endif %}
+
+                    <button onclick="openAssignPopup('{{ component[0] }}')">Assign to Project</button>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No components found.</p>
+        {% endif %}
+    </div>
+
+    <div class="popup" id="assignPopup">
+        <h3>Assign Component to Project</h3>
+        <form action="/assign_to_project" method="post">
+            <input type="hidden" name="component_id" id="assignComponentId">
+            
+            <div>
+                <label for="project_id">Select Project:</label>
+                <select id="project_id" name="project_id">
+                    {% for project in projects %}
+                        <option value="{{ project.project_id }}">{{ project.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" min="1">
+            </div>
+
+            <button type="submit">Assign</button>
+            <button type="button" onclick="closeAssignPopup()">Cancel</button>
+        </form>
+    </div>
+</body>
+</html>

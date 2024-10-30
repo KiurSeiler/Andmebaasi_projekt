@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Component Details</title>
+</head>
+<body>
+    <h1>Details for Component Type: {{ type }}</h1>
+    <table border="1">
+        {% if detail_data %}
+            {% for key, value in detail_data._asdict().items() %}
+                <tr>
+                    <th>{{ key }}</th>
+                    <td>{{ value }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="2">No details available for this component.</td>
+            </tr>
+        {% endif %}
+    </table>
+    <p><a href="{{ url_for('index') }}">Back to Components</a></p>
+</body>
+</html>
